@@ -108,12 +108,9 @@ async def validate_session_token(session_token: str) -> Optional[dict]:
     async with pool.acquire() as conn:
         session = await conn.fetchrow(
             """
-            SELECT s.id, s.user_id, s.expires_at, s.is_active,
-                   m.tenant_id
-            FROM sessions s
-            JOIN member m ON m.user_id = s.user_id AND m.is_active = true
-            WHERE s.id = $1
-            LIMIT 1
+            SELECT id, user_id, tenant_id, expires_at, is_active
+            FROM sessions
+            WHERE id = $1::uuid
             """,
             session_token,
         )
